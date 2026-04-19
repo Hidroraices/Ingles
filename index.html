@@ -733,8 +733,10 @@ const state = {
 /* ---------- VOICE SETUP ---------- */
 function loadVoices(){
   const voices = window.speechSynthesis.getVoices();
-  state.voice = voices.find(v=>/en-US/i.test(v.lang)&&/female|woman|samantha|allison|karen/i.test(v.name))
+  // Prefer British English voice — matches our British recognizer
+  state.voice = voices.find(v=>/en-GB/i.test(v.lang)&&/female|woman|kate|serena|libby|sonia|hazel/i.test(v.name))
              || voices.find(v=>/en-GB/i.test(v.lang))
+             || voices.find(v=>/en-US/i.test(v.lang)&&/female|samantha|allison|karen/i.test(v.name))
              || voices.find(v=>/en[-_]/i.test(v.lang))
              || voices[0];
 }
@@ -786,14 +788,37 @@ function diagnoseMic(){
   return { ok:true };
 }
 
-function initRecog(){
+function initRecog(lang){
   if(!SR) return null;
   const r = new SR();
-  r.lang = 'en-US';
+  r.lang = lang || 'en-GB'; // British is stricter with vowels than US
   r.interimResults = false;
-  r.maxAlternatives = 5; // get more candidates for better analysis
+  r.maxAlternatives = 5;
   r.continuous = false;
   return r;
+}
+
+/* ---------- EXPECTED DURATIONS (rough) for common short phrases ---------- */
+// English diphthongs/long vowels take longer than Spanish vowels
+// We use this to detect "rushed Spanish-style" pronunciation
+function expectedDuration(text){
+  const words = text.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(w=>w);
+  // Average English word ~0.35-0.45s when spoken naturally
+  // Words with diphthongs or long vowels take longer
+  const longVowelWords = ['name','nice','meet','time','five','nine','please','three','street','need','speak','week','here','clear','tree','meet','see','seen','mean','cheap','feel','people','beach','team','speak','reach','green','speak'];
+  const diphthongWords = ['name','day','way','say','play','make','take','late','date','place','same','came','wait','great','they','say','today','away'];
+  let totalMs = 0;
+  words.forEach(w=>{
+    let base = 350; // base ms per word
+    if(longVowelWords.includes(w)) base += 150;
+    if(diphthongWords.includes(w)) base += 100;
+    if(w.length >= 6) base += 80;
+    if(w.length <= 2) base -= 80;
+    totalMs += base;
+  });
+  // Plus inter-word pauses
+  totalMs += (words.length - 1) * 80;
+  return totalMs;
 }
 
 /* ---------- RENDER UNITS ---------- */
@@ -947,7 +972,7 @@ function startMic(expected, pattern){
     return;
   }
   if(listening){ try{recognition.stop()}catch(e){} return; }
-  recognition = initRecog();
+  recognition = initRecog('en-GB'); // stricter British recognizer
   if(!recognition) return;
 
   // Track attempts for this card
@@ -956,6 +981,12 @@ function startMic(expected, pattern){
   const btn = document.getElementById('micBtn');
   const status = document.getElementById('micStatus');
   const heard = document.getElementById('micHeard');
+
+  // Track speaking duration
+  let speakStartTime = 0;
+  let speakEndTime = 0;
+  recognition.onspeechstart = ()=>{ speakStartTime = Date.now(); };
+  recognition.onspeechend = ()=>{ speakEndTime = Date.now(); };
 
   recognition.onresult = (e)=>{
     // Capture all alternatives for better analysis
@@ -969,15 +1000,20 @@ function startMic(expected, pattern){
     const best = alternatives[0];
     const text = best.text;
     const confidence = best.confidence;
+    const actualDuration = speakEndTime > speakStartTime ? (speakEndTime - speakStartTime) : 0;
 
     // Run strict pronunciation analysis
-    const analysis = analyzePronunciation(expected, text, confidence, alternatives);
+    const analysis = analyzePronunciation(expected, text, confidence, alternatives, actualDuration);
     state.attemptCount++;
 
     // Show heard text with per-word coloring
     heard.innerHTML = `<b>Escuché:</b> ${analysis.colorizedHeard}
       <div style="margin-top:8px;font-size:12px;color:var(--ink-soft)">Esperado: <i>"${expected}"</i></div>
-      <div style="margin-top:6px;font-size:11px;color:var(--ink-soft)">Confianza del motor: ${Math.round(confidence*100)}% · Similitud: ${analysis.score}%</div>`;
+      <div style="margin-top:6px;font-size:11px;color:var(--ink-soft)">
+        Confianza motor (UK): ${Math.round(confidence*100)}% ·
+        Similitud: ${analysis.score}%${actualDuration ? ` ·
+        Duración: ${(actualDuration/1000).toFixed(1)}s ${analysis.durationFlag}` : ''}
+      </div>`;
     heard.classList.add('show');
 
     const fb = document.getElementById('feedback');
@@ -993,7 +1029,7 @@ function startMic(expected, pattern){
       fb.className='feedback good show';
       fb.innerHTML = `<div class="fb-title">Bien 🌿 ${analysis.score}/100</div>
         <div class="fb-text">${analysis.feedback}</div>
-        <div style="margin-top:10px;font-size:13px;color:var(--moss)"><b>Para subir a excelente:</b> repite una vez más enfocándote en las palabras en naranja arriba.</div>`;
+        <div style="margin-top:10px;font-size:13px;color:var(--moss)"><b>Para subir a excelente:</b> ${analysis.improvementTip}</div>`;
       state.sessionStats.correct++;
       state.sessionStats.xp += 7;
       document.getElementById('continueBtn').classList.add('show');
@@ -1004,7 +1040,6 @@ function startMic(expected, pattern){
         <div class="fb-text">${analysis.feedback}</div>
         <div style="margin-top:10px;font-size:13px"><b>Tu intento ${state.attemptCount}/3:</b> Toca 🐢 lento, escucha bien y vuelve a intentar.</div>`;
       state.sessionStats.xp += 3;
-      // Allow continue after 2 attempts
       if(state.attemptCount >= 2){
         document.getElementById('continueBtn').classList.add('show');
         state.attemptCount = 0;
@@ -1014,8 +1049,7 @@ function startMic(expected, pattern){
       fb.innerHTML = `<div class="fb-title">Sigamos practicando 🍂 ${analysis.score}/100</div>
         <div class="fb-text">${analysis.feedback}</div>
         <div style="margin-top:10px;font-size:13px"><b>Tu intento ${state.attemptCount}/3:</b> Sin culpa. Toca 🐢, escucha 2-3 veces, repite.</div>`;
-      state.sessionStats.total++; // count attempts
-      // Allow continue after 3 attempts so you don't get stuck
+      state.sessionStats.total++;
       if(state.attemptCount >= 3){
         document.getElementById('continueBtn').classList.add('show');
         state.attemptCount = 0;
@@ -1042,7 +1076,7 @@ function startMic(expected, pattern){
     recognition.start();
     listening = true;
     btn.classList.add('recording');
-    status.textContent = '🔴 Te escucho… habla ahora';
+    status.textContent = '🔴 Te escucho… habla ahora (acento UK estricto)';
   }catch(e){
     handleMicError('start-failed', expected);
   }
@@ -1083,13 +1117,12 @@ function normalizeText(s){
     .trim();
 }
 
-function analyzePronunciation(expected, heard, confidence, alternatives){
+function analyzePronunciation(expected, heard, confidence, alternatives, actualDurationMs){
   const expWords = normalizeText(expected).split(' ').filter(w=>w);
   const heardWords = normalizeText(heard).split(' ').filter(w=>w);
 
-  // Per-word match: align each expected word with best match in heard
+  // Per-word match
   const wordResults = expWords.map((expW, idx) => {
-    // Look for the word in heard at the same position first, then nearby
     let bestSim = 0;
     let bestHeard = '';
     const searchStart = Math.max(0, idx-1);
@@ -1098,7 +1131,6 @@ function analyzePronunciation(expected, heard, confidence, alternatives){
       const sim = wordSimilarity(expW, heardWords[j] || '');
       if(sim > bestSim){ bestSim = sim; bestHeard = heardWords[j]; }
     }
-    // Also search across all heard words
     for(let j=0; j<heardWords.length; j++){
       const sim = wordSimilarity(expW, heardWords[j]);
       if(sim > bestSim){ bestSim = sim; bestHeard = heardWords[j]; }
@@ -1106,51 +1138,93 @@ function analyzePronunciation(expected, heard, confidence, alternatives){
     return { expected: expW, heard: bestHeard, similarity: bestSim };
   });
 
-  // Aggregate score: average similarity, weighted by confidence
+  // Aggregate score
   const avgSim = wordResults.reduce((s,r)=>s+r.similarity, 0) / Math.max(1, wordResults.length);
   const lengthRatio = Math.min(heardWords.length, expWords.length) / Math.max(heardWords.length, expWords.length);
-  // Confidence boost: if engine is < 50% sure, penalize
   const confFactor = confidence > 0 ? Math.min(1, confidence + 0.3) : 0.85;
-  const rawScore = avgSim * 0.7 + lengthRatio * 0.2 + confFactor * 0.1;
-  const score = Math.round(rawScore * 100);
 
-  // Build colorized heard text (per-word coloring)
+  // ===== DURATION ANALYSIS =====
+  // If you said "neim" instead of "neɪm", you spoke faster than expected
+  let durationFactor = 1.0;
+  let durationFlag = '';
+  let durationPenalty = 0;
+  if(actualDurationMs > 0){
+    const expectedMs = expectedDuration(expected);
+    const ratio = actualDurationMs / expectedMs;
+    if(ratio < 0.55){
+      // Way too fast — likely Spanish-style pronunciation skipping diphthongs
+      durationFactor = 0.6;
+      durationPenalty = 25;
+      durationFlag = '⚠ muy rápido';
+    } else if(ratio < 0.75){
+      // A bit too fast — diphthongs probably collapsed
+      durationFactor = 0.8;
+      durationPenalty = 12;
+      durationFlag = '⚡ algo rápido';
+    } else if(ratio > 2.0){
+      // Way too slow — but that's not bad for learning
+      durationFactor = 0.95;
+      durationFlag = '🐢 lento, ok';
+    } else {
+      durationFlag = '✓ ritmo ok';
+    }
+  }
+
+  const rawScore = avgSim * 0.55 + lengthRatio * 0.15 + confFactor * 0.10 + durationFactor * 0.20;
+  let score = Math.round(rawScore * 100);
+  // Apply duration penalty as hard cap
+  if(durationPenalty > 0) score = Math.min(score, 100 - durationPenalty);
+  score = Math.max(0, Math.min(100, score));
+
+  // Build colorized heard text
   const colorized = wordResults.map(r => {
     if(r.similarity >= 0.85) return `<span style="color:var(--moss);font-weight:600">${r.expected}</span>`;
     if(r.similarity >= 0.6) return `<span style="color:#a07a1d;font-weight:600">${r.expected}</span>`;
     return `<span style="color:var(--warm);font-weight:600;text-decoration:line-through">${r.expected}</span>`;
   }).join(' ');
 
-  // Identify weak words for feedback
+  // Identify weak words
   const weakWords = wordResults.filter(r => r.similarity < 0.7).map(r => r.expected);
   const wrongLength = Math.abs(heardWords.length - expWords.length) > 2;
 
+  // Tips for improvement
+  let improvementTip = 'Repite enfocándote en las palabras en naranja arriba.';
+  if(durationPenalty >= 20){
+    improvementTip = `Estás hablando muy rápido. En inglés, vocales como en "<b>name</b>" (neɪm) o "<b>nice</b>" (naɪs) tienen DOS sonidos pegados, no uno. Alarga las vocales — lleva más tiempo del que crees.`;
+  } else if(durationPenalty >= 10){
+    improvementTip = `Cuida los diptongos (vocales dobles). "Name" no es "nem", es "ne-im" en una sola sílaba pero alargada.`;
+  }
+
   let grade, feedback;
-  if(score >= 88 && weakWords.length === 0){
+  if(score >= 88 && weakWords.length === 0 && durationPenalty === 0){
     grade = 'excellent';
-    feedback = 'Pronunciación clara y completa. La entendiste y te entendió.';
-  } else if(score >= 75 && weakWords.length <= 1){
+    feedback = 'Pronunciación clara, ritmo natural. Sonaste como un hablante real.';
+  } else if(score >= 75 && weakWords.length <= 1 && durationPenalty < 15){
     grade = 'good';
     feedback = weakWords.length
-      ? `Casi todo bien. La palabra que más te costó: <b>"${weakWords[0]}"</b>. Escucha cómo la dice la voz y enfócate ahí.`
-      : 'Buena pronunciación general, falta un poco de fluidez.';
+      ? `Casi todo bien. Lo que más te costó: <b>"${weakWords[0]}"</b>. ${durationPenalty > 0 ? 'Y un poquito apurado.' : ''}`
+      : (durationPenalty > 0 ? 'Las palabras correctas, pero apurado. Alarga las vocales largas.' : 'Buena pronunciación general.');
   } else if(score >= 55){
     grade = 'partial';
-    if(wrongLength){
-      feedback = `Dijiste ${heardWords.length} palabras pero la frase tiene ${expWords.length}. ${heardWords.length < expWords.length ? 'Te faltó completar la frase.' : 'Agregaste palabras de más.'} `;
+    if(durationPenalty >= 20){
+      feedback = `${durationFlag.replace('⚠ ','')}. Las palabras se reconocieron pero las dijiste como en español, sin estirar las vocales largas. <b>Truco:</b> imagina que cada vocal en inglés es DOBLE (a → ei, o → ou).`;
+    } else if(wrongLength){
+      feedback = `Dijiste ${heardWords.length} palabras, la frase tiene ${expWords.length}. ${heardWords.length < expWords.length ? 'Faltó completar.' : 'Hubo palabras extra.'}`;
     } else {
-      feedback = `Algunas palabras se entendieron, otras no. Las que necesitan trabajo: <b>${weakWords.slice(0,3).join(', ')}</b>.`;
+      feedback = `Algunas palabras flojas: <b>${weakWords.slice(0,3).join(', ')}</b>. Escucha 🐢 y copia el sonido exacto.`;
     }
   } else {
     grade = 'bad';
     if(heardWords.length === 0 || score < 25){
-      feedback = `No se entendió la frase. Acércate al micrófono, habla más despacio y claro. Si sigue fallando, usa "Sin micrófono".`;
+      feedback = `No se entendió nada claro. Acércate al micrófono y habla más fuerte. Si sigue, usa "Sin micrófono".`;
+    } else if(durationPenalty >= 20){
+      feedback = `Lo que dijiste sonó muy "español" — sin diptongos. En inglés las vocales pesadas (a, e, o, i) suelen ser dobles. Escucha la voz lentamente y nota cuánto se estira cada palabra.`;
     } else {
-      feedback = `La frase está bastante diferente. Lo que se escuchó: "<i>${heard}</i>". Escucha la versión lenta 🐢 y trata de imitar el ritmo.`;
+      feedback = `Lo escuchado: "<i>${heard}</i>". Está bastante diferente. Escucha 2 veces lento 🐢 antes de repetir.`;
     }
   }
 
-  return { grade, score, feedback, colorizedHeard: colorized, weakWords };
+  return { grade, score, feedback, colorizedHeard: colorized, weakWords, durationFlag, improvementTip };
 }
 
 function handleMicError(code, expected){
@@ -1208,7 +1282,7 @@ function startMicFree(patternSrc, expected){
     return;
   }
   if(listening){ try{recognition.stop()}catch(e){} return; }
-  recognition = initRecog();
+  recognition = initRecog('en-GB');
   const btn = document.getElementById('micBtn');
   const status = document.getElementById('micStatus');
   const heard = document.getElementById('micHeard');
