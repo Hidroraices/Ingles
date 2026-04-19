@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0f172a" />
+<title>Encore · Inglés sin culpa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf7f2;
+  --ink:#0f172a;
+  --ink-soft:#475569;
+  --muted:#94a3b8;
+  --paper:#ffffff;
+  --line:#e8e2d6;
+  --warm:#e76f51;
+  --warm-soft:#fde2d6;
+  --moss:#3a7d5e;
+  --moss-soft:#d8ebde;
+  --sun:#e9b949;
+  --sun-soft:#fbeacb;
+  --plum:#6d4c7d;
+  --shadow-sm:0 2px 8px -2px rgba(15,23,42,0.08);
+  --shadow:0 8px 28px -10px rgba(15,23,42,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+  line-height:1.5;
+  min-height:100vh;
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+body{
+  max-width:520px;
+  margin:0 auto;
+  padding:0 0 90px;
+  position:relative;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(231,111,81,0.06), transparent 50%),
+    radial-gradient(circle at 100% 30%, rgba(58,125,94,0.05), transparent 50%),
+    var(--bg);
+}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,247,242,0.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--ink);color:var(--bg);
+  display:grid;place-items:center;
+  font-family:'Instrument Serif',serif;
+  font-size:22px;font-style:italic;
+  transform:rotate(-3deg);
+}
+.brand-name{font-family:'Instrument Serif',serif;font-size:22px;font-weight:400;letter-spacing:-0.01em}
+.brand-name em{font-style:italic;color:var(--warm)}
+
+.streak{
+  display:flex;align-items:center;gap:6px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:13px;font-weight:600;
+}
+.streak .flame{font-size:14px}
+
+/* ============ SCREENS ============ */
+.screen{display:none;padding:20px;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============ HOME ============ */
+.greeting{margin:8px 0 24px}
+.greeting .hi{font-size:14px;color:var(--ink-soft);font-weight:500}
+.greeting h1{
+  font-family:'Instrument Serif',serif;
+  font-size:34px;font-weight:400;letter-spacing:-0.02em;
+  line-height:1.1;margin-top:4px;
+}
+.greeting h1 em{font-style:italic;color:var(--warm)}
+
+.affirm{
+  background:linear-gradient(135deg,var(--moss-soft) 0%, #ecf3e0 100%);
+  border:1px solid #bcd9c5;
+  border-radius:18px;
+  padding:18px 20px;
+  margin-bottom:20px;
+  position:relative;
+  overflow:hidden;
+}
+.affirm::before{
+  content:'"';
+  position:absolute;
+  top:-20px;right:14px;
+  font-family:'Instrument Serif',serif;
+  font-size:80px;color:var(--moss);
+  opacity:0.2;line-height:1;
+}
+.affirm p{font-size:14px;color:#1f4533;font-weight:500;font-style:italic;line-height:1.5}
+.affirm .author{display:block;margin-top:6px;font-size:11px;color:var(--moss);font-weight:600;font-style:normal;letter-spacing:0.05em;text-transform:uppercase}
+
+.daily-card{
+  background:var(--ink);
+  color:var(--bg);
+  border-radius:22px;
+  padding:24px 22px;
+  margin-bottom:20px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.daily-card::after{
+  content:'';position:absolute;
+  top:-30px;right:-30px;
+  width:140px;height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(231,111,81,0.5),transparent 70%);
+}
+.daily-card .label{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;font-weight:600}
+.daily-card .title{
+  font-family:'Instrument Serif',serif;
+  font-size:28px;line-height:1.15;margin:8px 0 4px;
+  font-weight:400;
+}
+.daily-card .sub{font-size:14px;opacity:0.75}
+.daily-card .meta{
+  display:flex;gap:14px;margin-top:18px;font-size:12px;opacity:0.7;font-weight:500;
+}
+.daily-card .meta span{display:flex;align-items:center;gap:5px}
+.daily-card .start{
+  background:var(--warm);color:#fff;
+  border:none;width:100%;
+  padding:14px;margin-top:18px;
+  border-radius:14px;
+  font-family:inherit;font-weight:700;font-size:15px;
+  cursor:pointer;transition:transform .15s;
+  position:relative;z-index:1;
+}
+.daily-card .start:active{transform:scale(0.98)}
+
+.section-label{
+  font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:700;margin:24px 0 12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+.units-list{display:flex;flex-direction:column;gap:10px}
+.unit-item{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.unit-item:active{transform:scale(0.98)}
+.unit-item:hover{box-shadow:var(--shadow-sm)}
+.unit-num{
+  width:46px;height:46px;border-radius:12px;
+  display:grid;place-items:center;
+  font-family:'Instrument Serif',serif;font-size:22px;font-weight:400;
+  flex-shrink:0;
+}
+.unit-num.u1{background:var(--warm-soft);color:var(--warm)}
+.unit-num.u2{background:var(--moss-soft);color:var(--moss)}
+.unit-num.u3{background:var(--sun-soft);color:#a07a1d}
+.unit-num.u4{background:#e8def0;color:var(--plum)}
+.unit-num.u5{background:#dceaf2;color:#3674a3}
+.unit-info{flex:1;min-width:0}
+.unit-info .t{font-weight:700;font-size:15px;line-height:1.3}
+.unit-info .s{font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.3}
+.unit-progress{
+  width:42px;height:42px;flex-shrink:0;position:relative;
+}
+.unit-progress svg{transform:rotate(-90deg)}
+.unit-progress .pct{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-size:11px;font-weight:700;color:var(--ink);
+}
+
+/* ============ LESSON SCREEN ============ */
+.lesson-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+}
+.back-btn{
+  background:var(--paper);border:1px solid var(--line);
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;
+  font-size:18px;cursor:pointer;flex-shrink:0;
+}
+.progress-bar{
+  flex:1;height:8px;background:var(--line);border-radius:999px;overflow:hidden;
+}
+.progress-bar .fill{
+  height:100%;background:var(--warm);
+  border-radius:999px;
+  transition:width .4s cubic-bezier(.2,.8,.2,1);
+}
+.progress-text{font-size:12px;color:var(--ink-soft);font-weight:600;flex-shrink:0}
+
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:24px 22px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow-sm);
+  min-height:380px;
+  display:flex;flex-direction:column;
+}
+.card-type{
+  font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:700;margin-bottom:14px;
+  display:flex;align-items:center;gap:6px;
+}
+.card-type .dot{width:6px;height:6px;border-radius:50%;background:var(--warm)}
+
+.card-title{
+  font-family:'Instrument Serif',serif;
+  font-size:26px;line-height:1.2;font-weight:400;
+  margin-bottom:8px;
+}
+.card-sub{
+  font-size:14px;color:var(--ink-soft);margin-bottom:20px;
+}
+
+/* Listen-Repeat card */
+.phrase-display{
+  background:linear-gradient(135deg,#fff8ed 0%, #fef3d6 100%);
+  border:1px solid #f0d99c;
+  border-radius:16px;
+  padding:24px 18px;
+  text-align:center;
+  margin-bottom:20px;
+}
+.phrase-en{
+  font-family:'Instrument Serif',serif;
+  font-size:30px;line-height:1.25;font-weight:400;
+  color:var(--ink);
+}
+.phrase-ipa{
+  font-size:14px;color:var(--ink-soft);font-style:italic;margin-top:6px;
+}
+.phrase-es{
+  font-size:14px;color:var(--ink-soft);margin-top:12px;
+  padding-top:12px;border-top:1px dashed #d9c89a;
+}
+.audio-row{display:flex;justify-content:center;gap:12px;margin-bottom:8px}
+.audio-btn{
+  background:var(--ink);color:var(--bg);
+  border:none;
+  height:54px;
+  padding:0 22px;border-radius:14px;
+  font-family:inherit;font-weight:600;font-size:14px;
+  cursor:pointer;display:flex;align-items:center;gap:8px;
+  transition:transform .15s;
+}
+.audio-btn:active{transform:scale(0.96)}
+.audio-btn.slow{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink)}
+.audio-btn.speaking{background:var(--warm);animation:pulseBtn 1.2s infinite}
+@keyframes pulseBtn{50%{opacity:0.85}}
+
+/* Mic */
+.mic-zone{
+  text-align:center;padding:14px 0;
+  border-top:1px dashed var(--line);margin-top:14px;
+}
+.mic-zone .label{font-size:13px;color:var(--ink-soft);margin-bottom:10px;font-weight:500}
+.mic-btn{
+  background:var(--warm);color:#fff;
+  border:none;width:74px;height:74px;border-radius:50%;
+  display:grid;place-items:center;font-size:30px;
+  cursor:pointer;margin:0 auto;
+  box-shadow:0 6px 0 #b8553e;
+  transition:transform .1s;
+}
+.mic-btn:active{transform:translateY(2px);box-shadow:0 3px 0 #b8553e}
+.mic-btn.recording{
+  background:#dc2626;
+  animation:micPulse 1s infinite;
+}
+@keyframes micPulse{
+  0%,100%{box-shadow:0 6px 0 #7f1d1d, 0 0 0 0 rgba(220,38,38,0.4)}
+  50%{box-shadow:0 6px 0 #7f1d1d, 0 0 0 18px rgba(220,38,38,0)}
+}
+.mic-status{margin-top:10px;font-size:13px;color:var(--ink-soft);font-weight:500;min-height:20px}
+.mic-heard{
+  margin-top:10px;padding:10px 14px;
+  background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  font-size:14px;color:var(--ink);font-style:italic;display:none;
+}
+.mic-heard.show{display:block}
+
+/* Choice card */
+.prompt-bubble{
+  background:var(--moss-soft);
+  border:1px solid #bcd9c5;
+  border-radius:16px;
+  padding:18px 20px;
+  margin-bottom:18px;
+  position:relative;
+}
+.prompt-bubble::after{
+  content:'';position:absolute;
+  bottom:-8px;left:24px;
+  width:16px;height:16px;
+  background:var(--moss-soft);
+  border-right:1px solid #bcd9c5;
+  border-bottom:1px solid #bcd9c5;
+  transform:rotate(45deg);
+}
+.prompt-speaker{font-size:11px;color:var(--moss);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.prompt-text{font-family:'Instrument Serif',serif;font-size:22px;line-height:1.3;color:#1f4533}
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.choice{
+  background:var(--paper);
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:14px 18px;
+  font-family:inherit;font-size:15px;font-weight:500;
+  text-align:left;cursor:pointer;color:var(--ink);
+  transition:all .15s;
+  display:flex;align-items:center;gap:12px;
+}
+.choice:active{transform:scale(0.98)}
+.choice:hover{border-color:var(--warm);background:#fffaf6}
+.choice .marker{
+  width:22px;height:22px;border-radius:6px;
+  background:var(--bg);border:1.5px solid var(--line);
+  display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink-soft);
+  flex-shrink:0;
+}
+.choice.correct{background:var(--moss-soft);border-color:var(--moss)}
+.choice.correct .marker{background:var(--moss);color:#fff;border-color:var(--moss)}
+.choice.wrong{background:var(--warm-soft);border-color:var(--warm);opacity:0.85}
+.choice.wrong .marker{background:var(--warm);color:#fff;border-color:var(--warm)}
+.choice:disabled{cursor:default}
+
+/* Type card */
+.type-input{
+  width:100%;
+  background:var(--bg);
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  font-family:inherit;font-size:16px;
+  margin-bottom:14px;
+  color:var(--ink);
+}
+.type-input:focus{outline:none;border-color:var(--warm)}
+
+/* Feedback */
+.feedback{
+  border-radius:14px;
+  padding:16px 18px;
+  margin-top:auto;
+  display:none;
+  border:1.5px solid;
+}
+.feedback.show{display:block;animation:fadeIn .3s}
+.feedback.good{background:var(--moss-soft);border-color:var(--moss);color:#1f4533}
+.feedback.partial{background:var(--sun-soft);border-color:var(--sun);color:#7d5e15}
+.feedback.bad{background:var(--warm-soft);border-color:var(--warm);color:#7d2f1c}
+.feedback .fb-title{font-weight:700;font-size:15px;margin-bottom:4px}
+.feedback .fb-text{font-size:14px;line-height:1.5}
+.feedback .fb-text b{font-style:normal}
+
+/* Continue button */
+.continue-btn{
+  background:var(--ink);color:var(--bg);
+  border:none;width:100%;
+  padding:15px;margin-top:14px;
+  border-radius:14px;
+  font-family:inherit;font-weight:700;font-size:15px;
+  cursor:pointer;transition:transform .15s;
+  display:none;
+}
+.continue-btn.show{display:block;animation:fadeIn .3s}
+.continue-btn:active{transform:scale(0.98)}
+
+/* ============ COMPLETION SCREEN ============ */
+.complete-screen{text-align:center;padding:40px 20px}
+.complete-icon{
+  font-size:72px;margin-bottom:14px;animation:popIn .5s cubic-bezier(.2,1.5,.5,1)
+}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.complete-title{
+  font-family:'Instrument Serif',serif;
+  font-size:34px;line-height:1.1;font-weight:400;
+}
+.complete-title em{font-style:italic;color:var(--warm)}
+.complete-msg{
+  font-size:15px;color:var(--ink-soft);
+  margin:14px 30px 24px;line-height:1.5;
+}
+.complete-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  margin:24px 0;
+}
+.stat-cell{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 8px;
+}
+.stat-cell .v{font-family:'Instrument Serif',serif;font-size:28px;line-height:1;color:var(--ink)}
+.stat-cell .l{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px}
+
+/* ============ TAB BAR ============ */
+.tabbar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:520px;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;
+  padding:8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index:40;
+}
+.tab{
+  background:none;border:none;padding:8px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;color:var(--muted);
+  font-family:inherit;font-size:11px;font-weight:600;
+  transition:color .15s;
+}
+.tab.active{color:var(--ink)}
+.tab .icon{font-size:22px;line-height:1}
+
+/* Vocab grid for review */
+.vocab-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
+.vocab-row{
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.vocab-row .en{font-weight:600;font-size:14px}
+.vocab-row .es{font-size:13px;color:var(--ink-soft)}
+.vocab-row button{
+  background:var(--bg);border:1px solid var(--line);
+  width:34px;height:34px;border-radius:10px;cursor:pointer;
+  display:grid;place-items:center;font-size:14px;flex-shrink:0;
+}
+
+.warn-banner{
+  background:var(--sun-soft);border:1px solid var(--sun);
+  border-radius:12px;padding:10px 14px;margin-bottom:14px;
+  font-size:12px;color:#7d5e15;display:none;
+}
+.warn-banner.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">e</div>
+    <div class="brand-name">Encore</div>
+  </div>
+  <div class="streak">
+    <span class="flame">🔥</span>
+    <span id="streakNum">0</span>
+    <span style="color:var(--ink-soft);font-weight:500">días</span>
+  </div>
+</div>
+
+<!-- ============ HOME ============ -->
+<div class="screen active" id="screen-home">
+  <div class="greeting">
+    <div class="hi" id="greetTime">Buenas</div>
+    <h1>Listo para tu <em>encore</em>.</h1>
+  </div>
+
+  <div id="homeMicWarn" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:14px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#7d5e15;line-height:1.5">
+    <div style="font-weight:700;margin-bottom:4px">⚠ <span id="homeMicWarnTitle"></span></div>
+    <div id="homeMicWarnMsg"></div>
+    <div style="margin-top:8px;font-style:italic;font-size:12px">No te preocupes — abajo de cada micrófono hay un botón <b>"Sin micrófono →"</b> que te deja practicar igual.</div>
+  </div>
+
+  <div class="affirm">
+    <p id="affirmText">Empezar a esta edad no es llegar tarde. Es llegar a tiempo a la versión de ti que quería intentarlo.</p>
+    <span class="author">Recordatorio del día</span>
+  </div>
+
+  <div class="daily-card">
+    <div class="label">Sesión de hoy · 15 min</div>
+    <div class="title" id="dailyTitle">Sara, this is Ed</div>
+    <div class="sub" id="dailySub">Saludar y deletrear tu nombre</div>
+    <div class="meta">
+      <span>📚 6 frases</span>
+      <span>🎤 4 prácticas orales</span>
+      <span>🧠 SRS activo</span>
+    </div>
+    <button class="start" onclick="startDaily()">Comenzar →</button>
+  </div>
+
+  <div class="section-label">
+    Tus 5 unidades del Ciclo 1
+    <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">Business · A1</span>
+  </div>
+
+  <div class="units-list" id="unitsList"></div>
+
+  <div class="section-label">Por qué esto funciona</div>
+  <div style="background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;font-size:13px;color:var(--ink-soft);line-height:1.6">
+    <b style="color:var(--ink)">15 minutos al día &gt; 2 horas el domingo.</b><br>
+    Tu cerebro adulto consolida mejor en sesiones cortas y diarias. Encore te trae solo lo que necesitas hoy: vocabulario nuevo + repaso de lo que estás por olvidar (SRS).
+  </div>
+</div>
+
+<!-- ============ LESSON ============ -->
+<div class="screen" id="screen-lesson">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div>
+    <span class="progress-text" id="progText">0/0</span>
+  </div>
+  <div id="warnBanner" class="warn-banner"></div>
+  <div id="cardSlot"></div>
+</div>
+
+<!-- ============ COMPLETE ============ -->
+<div class="screen" id="screen-complete">
+  <div class="complete-screen">
+    <div class="complete-icon">🌱</div>
+    <div class="complete-title">Otro día, otro <em>paso</em></div>
+    <div class="complete-msg" id="completeMsg">No hiciste todo perfecto, y eso está bien. Hiciste hoy. Mañana es la única regla.</div>
+    <div class="complete-stats">
+      <div class="stat-cell"><div class="v" id="statXP">0</div><div class="l">XP hoy</div></div>
+      <div class="stat-cell"><div class="v" id="statStreak">1</div><div class="l">Racha</div></div>
+      <div class="stat-cell"><div class="v" id="statAcc">0%</div><div class="l">Aciertos</div></div>
+    </div>
+    <button class="audio-btn" style="background:var(--ink);color:#fff;width:100%;padding:14px;border-radius:14px;justify-content:center" onclick="goHome()">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ============ VOCAB / REVIEW SCREEN ============ -->
+<div class="screen" id="screen-vocab">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div style="flex:1;font-family:'Instrument Serif',serif;font-size:22px">Tu vocabulario</div>
+  </div>
+  <div style="font-size:13px;color:var(--ink-soft);margin-bottom:14px">Toca el altavoz para escuchar. Las frases con ⭐ son las que el sistema te traerá de repaso pronto.</div>
+  <div id="vocabGrid" class="vocab-grid"></div>
+</div>
+
+<!-- ============ TAB BAR ============ -->
+<nav class="tabbar">
+  <button class="tab active" data-screen="home" onclick="showTab('home')">
+    <div class="icon">🏠</div>Inicio
+  </button>
+  <button class="tab" data-screen="vocab" onclick="showTab('vocab')">
+    <div class="icon">📖</div>Frases
+  </button>
+  <button class="tab" data-screen="profile" onclick="showProfile()">
+    <div class="icon">🎯</div>Progreso
+  </button>
+</nav>
+
+<script>
+/* ============================================================
+   ENCORE — Inglés Business A1 sin culpa
+   Basado en Ciclo 1 (Units 01-05) — Business Communication
+   ============================================================ */
+
+/* ---------- AFFIRMATIONS (rotates) ---------- */
+const AFFIRMS = [
+  "Empezar a esta edad no es llegar tarde. Es llegar a tiempo a la versión de ti que quería intentarlo.",
+  "Tu cerebro adulto tiene una ventaja que un niño no tiene: sabes por qué quieres aprender.",
+  "Cada minuto que practicas hoy, tu yo de dentro de un año te lo agradece.",
+  "El mejor inglés no es el más perfecto. Es el que se anima a hablar.",
+  "No estás aprendiendo desde cero. Estás aprendiendo desde toda tu experiencia.",
+  "Hablar mal hoy es mejor que hablar perfecto el año que viene.",
+  "La culpa no enseña. La constancia, sí.",
+  "Quien aprende a los 40 elige aprender. Eso vale más que el talento.",
+];
+
+/* ---------- CONTENT: drawn from the Ciclo 1 manual ---------- */
+const UNITS = [
+  {
+    id:1, num:'01', cls:'u1',
+    title:"Sara, this is Ed",
+    sub:"Alfabeto · presentaciones · deletrear",
+    cards:[
+      // Listen-repeat phrases (Unit 1)
+      {type:'listen', en:"Hello, what's your name?", es:"Hola, ¿cuál es tu nombre?", ipa:"həˈloʊ, wʌts jɔr neɪm"},
+      {type:'listen', en:"Hi, I'm Ed.", es:"Hola, soy Ed.", ipa:"haɪ, aɪm ed"},
+      {type:'listen', en:"Nice to meet you.", es:"Encantado de conocerte.", ipa:"naɪs tə miːt juː"},
+      {type:'choice', prompt:"Hello, what's your name?",
+        options:["I'm fine, thanks.","Hi, I'm María.","Goodbye!","Yes, I am."],
+        correct:1, hint:"Te están preguntando tu nombre."},
+      {type:'listen', en:"Can you spell your surname, please?", es:"¿Puedes deletrear tu apellido, por favor?"},
+      {type:'speak', en:"My surname is …", es:"Di tu apellido y deletréalo. Por ejemplo: 'My surname is Lopez. L-O-P-E-Z.'", expectPattern:/(my surname|it'?s|i'?m)/i},
+      {type:'choice', prompt:"Para deletrear, ¿cómo se dice la letra 'H' en inglés?",
+        options:["Hash","Aitch","Ha","Hi"], correct:1, hint:"Suena como 'eich'."},
+      {type:'listen', en:"Yes, it's H-E-N-L-E-Y.", es:"Sí, es H-E-N-L-E-Y."},
+      {type:'speak', en:"Hello, I'm [tu nombre]. Nice to meet you.", es:"Preséntate completo en voz alta.", expectPattern:/(hello|hi).*(i'?m|my name).*?(nice to meet|pleased)/i},
+    ]
+  },
+  {
+    id:2, num:'02', cls:'u2',
+    title:"I start work at 8am",
+    sub:"Números · hora · rutinas · present simple",
+    cards:[
+      {type:'listen', en:"What time do you start work?", es:"¿A qué hora empiezas a trabajar?"},
+      {type:'listen', en:"I start work at nine o'clock.", es:"Empiezo a trabajar a las nueve en punto.", ipa:"aɪ stɑːrt wɜːrk æt naɪn əˈklɑːk"},
+      {type:'choice', prompt:"¿Cómo se dice '7:30' en inglés?",
+        options:["Seven and thirty","Half past seven","Seven half","Thirty seven"], correct:1,
+        hint:"Las medias horas se dicen 'half past + la hora'."},
+      {type:'choice', prompt:"¿Cómo se dice '8:15'?",
+        options:["Eight fifteen / Quarter past eight","Eight and quarter","Past eight quarter","Quarter eight"], correct:0,
+        hint:"Las dos formas son válidas."},
+      {type:'listen', en:"I have lunch at twelve thirty.", es:"Almuerzo a las doce y media."},
+      {type:'speak', en:"I start work at … / I have lunch at …", es:"Di tu propio horario en voz alta.", expectPattern:/(i start|i have|i finish).*(at|past|quarter|half|o'?clock|\d)/i},
+      {type:'choice', prompt:"Completa: 'I ___ emails every morning.'",
+        options:["check","checks","checking","to check"], correct:0,
+        hint:"Con 'I' (yo), el verbo va sin -s en presente simple."},
+      {type:'choice', prompt:"Completa: 'She ___ a meeting at 9.'",
+        options:["have","has","haves","having"], correct:1,
+        hint:"Con he/she/it, el verbo lleva -s. 'Have' se vuelve 'has'."},
+      {type:'listen', en:"Quarter past ten.", es:"Diez y cuarto.", ipa:"ˈkwɔrtər pæst ten"},
+    ]
+  },
+  {
+    id:3, num:'03', cls:'u3',
+    title:"Where do you work?",
+    sub:"Trabajos · sectores · empresas",
+    cards:[
+      {type:'listen', en:"Where do you work?", es:"¿Dónde trabajas?"},
+      {type:'listen', en:"I work for Aceros Arequipa.", es:"Trabajo para Aceros Arequipa.", ipa:"aɪ wɜrk fɔr …"},
+      {type:'listen', en:"What do you do?", es:"¿A qué te dedicas?"},
+      {type:'listen', en:"I'm a process engineer.", es:"Soy ingeniero de procesos."},
+      {type:'choice', prompt:"Para profesiones que empiezan en vocal, se usa:",
+        options:["a engineer","an engineer","one engineer","the engineer"], correct:1,
+        hint:"'An' antes de sonido vocal: an engineer, an architect, an HR manager."},
+      {type:'speak', en:"I'm a … / I work for … in …", es:"Di tu trabajo y empresa. Ej: 'I'm a process engineer. I work for Aceros Arequipa in Pisco.'", expectPattern:/(i'?m a|i work|i'?m an).*\w+/i},
+      {type:'choice', prompt:"¿Cómo dirías '2,500 employees' en voz alta?",
+        options:["two thousand five hundred","twenty-five hundred","two-five-zero-zero","two thousand and five hundred employees"],
+        correct:0, hint:"Más natural: 'two thousand five hundred'."},
+      {type:'choice', prompt:"Completa: 'How big ___ your company?'",
+        options:["are","is","do","does"], correct:1,
+        hint:"'Company' es singular → 'is'."},
+      {type:'listen', en:"It has about two thousand employees.", es:"Tiene aproximadamente dos mil empleados."},
+    ]
+  },
+  {
+    id:4, num:'04', cls:'u4',
+    title:"Can I help you?",
+    sub:"Días · meses · fechas · agendar reuniones",
+    cards:[
+      {type:'listen', en:"Are you free on Tuesday?", es:"¿Estás libre el martes?"},
+      {type:'listen', en:"Yes, I can meet at three pm.", es:"Sí, puedo reunirme a las tres de la tarde."},
+      {type:'choice', prompt:"¿Cuál es la forma corta correcta de 'cannot'?",
+        options:["can't","ca'nt","can'not","cant"], correct:0,
+        hint:"Va todo junto: can + 't."},
+      {type:'choice', prompt:"Selecciona la respuesta negativa:",
+        options:["Yes, it's possible.","No, it isn't possible.","It can.","Sorry, no can."], correct:1,
+        hint:"'Isn't' = is not."},
+      {type:'listen', en:"My birthday is on the 24th of November.", es:"Mi cumpleaños es el 24 de noviembre."},
+      {type:'choice', prompt:"En inglés británico de negocios, '10/05/2025' se lee como:",
+        options:["October fifth","The tenth of May","May tenth","Tenth October"], correct:1,
+        hint:"Día/mes/año → 'the tenth of May'."},
+      {type:'speak', en:"My birthday is on the … of …", es:"Di la fecha de tu cumpleaños en inglés.", expectPattern:/(my birthday|it'?s|on the).*(january|february|march|april|may|june|july|august|september|october|november|december)/i},
+      {type:'choice', prompt:"Completa: 'Can you ___ Friday at 10?'",
+        options:["meet on","meet in","meet at","meet to"], correct:0,
+        hint:"Con días de la semana: 'on Monday', 'on Friday'."},
+      {type:'listen', en:"Can we meet at five pm in the morning?", es:"¿Podemos reunirnos a las cinco?"},
+    ]
+  },
+  {
+    id:5, num:'05', cls:'u5',
+    title:"I'm here to see Jo",
+    sub:"Oficinas · preposiciones · small talk · emails",
+    cards:[
+      {type:'listen', en:"Good morning. I'm here to see Jo.", es:"Buenos días. Vine a ver a Jo."},
+      {type:'listen', en:"Welcome. Please take a seat.", es:"Bienvenido. Por favor, tome asiento."},
+      {type:'choice', prompt:"'The meeting room is ___ the second floor.'",
+        options:["in","on","at","to"], correct:1,
+        hint:"'On' para pisos: on the first floor, on the second floor."},
+      {type:'choice', prompt:"'My office is ___ to the kitchen.'",
+        options:["next","near","close","beside"], correct:0,
+        hint:"'Next to' = al lado de."},
+      {type:'listen', en:"It's opposite the lift.", es:"Está frente al ascensor."},
+      {type:'speak', en:"How was your journey?", es:"Pregunta tipo small talk. Practica diciendo: 'How was your journey?'", expectPattern:/(how was|how'?s).*(journey|trip|flight)/i},
+      {type:'choice', prompt:"Tu visitante dice 'How was your journey?'. Respondes:",
+        options:["Yes, please.","It was good, thanks.","I'm fine.","Goodbye!"], correct:1,
+        hint:"Responder al small talk con: 'It was good/fine, thanks.'"},
+      {type:'listen', en:"Would you like a coffee or tea?", es:"¿Le gustaría un café o té?"},
+      {type:'choice', prompt:"Para terminar un email formal, lo mejor es:",
+        options:["Bye!","Best wishes,","Love,","See ya!"], correct:1,
+        hint:"'Best wishes,' o 'Best regards,' son los cierres seguros en negocios."},
+    ]
+  },
+];
+
+/* ---------- STATE (in-memory only — Encore is a session-based prototype) ---------- */
+const state = {
+  streak: 1,
+  xp: 0,
+  unitProgress: {1:0, 2:0, 3:0, 4:0, 5:0}, // % completado
+  currentUnit: null,
+  currentCardIdx: 0,
+  sessionStats: {correct:0, total:0, xp:0},
+  vocabSeen: [], // {en, es, unit}
+  voice: null,
+};
+
+/* ---------- TIME-OF-DAY GREETING ---------- */
+(function setGreeting(){
+  const h = new Date().getHours();
+  const greet = h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  document.getElementById('greetTime').textContent = greet;
+  // Rotate affirmation by day-of-year
+  const day = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  document.getElementById('affirmText').textContent = AFFIRMS[day % AFFIRMS.length];
+})();
+
+/* ---------- VOICE SETUP ---------- */
+function loadVoices(){
+  const voices = window.speechSynthesis.getVoices();
+  state.voice = voices.find(v=>/en-US/i.test(v.lang)&&/female|woman|samantha|allison|karen/i.test(v.name))
+             || voices.find(v=>/en-GB/i.test(v.lang))
+             || voices.find(v=>/en[-_]/i.test(v.lang))
+             || voices[0];
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speak(text, rate, cb){
+  if(!('speechSynthesis' in window)){ cb&&cb(); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  if(state.voice) u.voice = state.voice;
+  u.rate = rate || 0.95;
+  u.pitch = 1.0;
+  u.onend = ()=>{ document.querySelectorAll('.audio-btn').forEach(b=>b.classList.remove('speaking')); cb&&cb(); };
+  u.onerror = ()=>{ document.querySelectorAll('.audio-btn').forEach(b=>b.classList.remove('speaking')); cb&&cb(); };
+  window.speechSynthesis.speak(u);
+}
+
+/* ---------- SPEECH RECOGNITION + DIAGNOSTICS ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let listening = false;
+let micDiagnosis = null; // 'ok' | 'no-api' | 'insecure' | 'no-permission' | 'unknown'
+
+function diagnoseMic(){
+  // 1. Check if API exists
+  if(!SR){
+    micDiagnosis = 'no-api';
+    return { ok:false, code:'no-api',
+      title:'Tu navegador no soporta reconocimiento de voz',
+      msg:'La Web Speech API no está disponible. Funciona mejor en Chrome (Android/desktop). En iPhone Safari/Chrome no funciona.' };
+  }
+  // 2. Check secure context (https or localhost). file:// blocks mic.
+  if(location.protocol === 'file:'){
+    micDiagnosis = 'insecure';
+    return { ok:false, code:'insecure',
+      title:'El archivo se abrió como "file://"',
+      msg:'Por seguridad, los navegadores bloquean el micrófono en archivos locales. Sube el HTML a un servidor gratis (netlify.app/drop) y abre la URL en tu celular.' };
+  }
+  if(!window.isSecureContext){
+    micDiagnosis = 'insecure';
+    return { ok:false, code:'insecure',
+      title:'Conexión no segura',
+      msg:'El micrófono solo funciona en https:// o localhost. La URL actual no es segura.' };
+  }
+  micDiagnosis = 'ok';
+  return { ok:true };
+}
+
+function initRecog(){
+  if(!SR) return null;
+  const r = new SR();
+  r.lang = 'en-US';
+  r.interimResults = false;
+  r.maxAlternatives = 3;
+  return r;
+}
+
+/* ---------- RENDER UNITS ---------- */
+function renderUnits(){
+  const list = document.getElementById('unitsList');
+  list.innerHTML = UNITS.map(u=>{
+    const pct = state.unitProgress[u.id] || 0;
+    const r = 18, c = 2*Math.PI*r;
+    const off = c - (pct/100)*c;
+    return `
+      <div class="unit-item" onclick="openUnit(${u.id})">
+        <div class="unit-num ${u.cls}">${u.num}</div>
+        <div class="unit-info">
+          <div class="t">${u.title}</div>
+          <div class="s">${u.sub}</div>
+        </div>
+        <div class="unit-progress">
+          <svg width="42" height="42">
+            <circle cx="21" cy="21" r="${r}" fill="none" stroke="var(--line)" stroke-width="3"/>
+            <circle cx="21" cy="21" r="${r}" fill="none" stroke="var(--warm)" stroke-width="3"
+              stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"/>
+          </svg>
+          <div class="pct">${pct}%</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ---------- OPEN UNIT / DAILY ---------- */
+function startDaily(){
+  // Pick first unit not at 100%
+  const next = UNITS.find(u=>(state.unitProgress[u.id]||0) < 100) || UNITS[0];
+  openUnit(next.id);
+}
+function openUnit(id){
+  state.currentUnit = UNITS.find(u=>u.id===id);
+  state.currentCardIdx = 0;
+  state.sessionStats = {correct:0, total:0, xp:0};
+  showScreen('lesson');
+  renderCard();
+}
+
+/* ---------- RENDER CARD ---------- */
+function renderCard(){
+  const u = state.currentUnit;
+  const i = state.currentCardIdx;
+  const total = u.cards.length;
+  const card = u.cards[i];
+
+  // Progress bar
+  document.getElementById('progFill').style.width = `${(i/total)*100}%`;
+  document.getElementById('progText').textContent = `${i+1}/${total}`;
+
+  const slot = document.getElementById('cardSlot');
+
+  if(card.type==='listen'){
+    slot.innerHTML = `
+      <div class="card">
+        <div class="card-type"><span class="dot"></span>Escucha y repite</div>
+        <div class="phrase-display">
+          <div class="phrase-en">${card.en}</div>
+          ${card.ipa?`<div class="phrase-ipa">/${card.ipa}/</div>`:''}
+          <div class="phrase-es">${card.es}</div>
+        </div>
+        <div class="audio-row">
+          <button class="audio-btn" onclick="playPhrase('${escQ(card.en)}', 0.95, this)">🔊 Escuchar</button>
+          <button class="audio-btn slow" onclick="playPhrase('${escQ(card.en)}', 0.65, this)">🐢 Lento</button>
+        </div>
+        <div class="mic-zone">
+          <div class="label">Repite la frase en voz alta</div>
+          <button class="mic-btn" id="micBtn" onclick="startMic('${escQ(card.en)}', /${card.en.split(' ').slice(0,3).map(w=>w.replace(/[^a-z]/gi,'')).join('|')}/i)">🎤</button>
+          <div class="mic-status" id="micStatus">Toca el micrófono</div>
+          <div class="mic-heard" id="micHeard"></div>
+          <button class="audio-btn slow" style="margin-top:10px;font-size:12px;padding:0 14px;height:36px" onclick="manualMode('${escQ(card.en)}')">Sin micrófono →</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="continue-btn" id="continueBtn" onclick="nextCard()">Siguiente →</button>
+      </div>`;
+    // Auto-play once
+    setTimeout(()=>playPhrase(card.en, 0.95, document.querySelector('.audio-btn')), 350);
+    // Vocab tracking
+    if(!state.vocabSeen.find(v=>v.en===card.en)) state.vocabSeen.push({en:card.en, es:card.es, unit:u.num});
+    // Show continue immediately for listen cards
+    setTimeout(()=>document.getElementById('continueBtn').classList.add('show'), 1500);
+
+  } else if(card.type==='choice'){
+    slot.innerHTML = `
+      <div class="card">
+        <div class="card-type"><span class="dot"></span>Elige la respuesta</div>
+        <div class="prompt-bubble">
+          <div class="prompt-speaker">Pregunta</div>
+          <div class="prompt-text">${card.prompt}</div>
+        </div>
+        <div class="choices" id="choices">
+          ${card.options.map((opt,idx)=>`
+            <button class="choice" data-idx="${idx}" onclick="pickChoice(${idx}, ${card.correct}, '${escQ(card.hint||'')}')">
+              <span class="marker">${String.fromCharCode(65+idx)}</span>
+              <span>${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="continue-btn" id="continueBtn" onclick="nextCard()">Siguiente →</button>
+      </div>`;
+    // Speak the prompt if it's an English phrase (heuristic: first word in English)
+    if(/^[A-Z][a-z]+\b.*\?\s*$/.test(card.prompt) && /[a-z]\s[a-z]/i.test(card.prompt)){
+      setTimeout(()=>playPhrase(card.prompt, 0.95), 350);
+    }
+
+  } else if(card.type==='speak'){
+    slot.innerHTML = `
+      <div class="card">
+        <div class="card-type"><span class="dot"></span>Habla en voz alta</div>
+        <div class="prompt-bubble" style="background:var(--warm-soft);border-color:#f3c4a8">
+          <div class="prompt-speaker" style="color:var(--warm)">Tu turno</div>
+          <div class="prompt-text" style="color:#7d2f1c">${card.en}</div>
+        </div>
+        <div style="font-size:14px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">${card.es}</div>
+        <div class="mic-zone" style="border-top:none;margin-top:0;padding-top:0">
+          <button class="mic-btn" id="micBtn" onclick="startMicFree(${JSON.stringify(card.expectPattern.source).replace(/"/g,'&quot;')}, '${escQ(card.en)}')">🎤</button>
+          <div class="mic-status" id="micStatus">Toca y habla cuando estés listo</div>
+          <div class="mic-heard" id="micHeard"></div>
+          <button class="audio-btn slow" style="margin-top:10px;font-size:12px;padding:0 14px;height:36px" onclick="manualMode('${escQ(card.en)}')">Sin micrófono →</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="continue-btn" id="continueBtn" onclick="nextCard()">Siguiente →</button>
+      </div>`;
+  }
+
+  // Speech recognition diagnosis at start
+  const banner = document.getElementById('warnBanner');
+  const d = diagnoseMic();
+  if(!d.ok){
+    banner.classList.add('show');
+    banner.innerHTML = `<b>${d.title}</b><br>${d.msg} Igual puedes seguir tocando "Sin micrófono →" para practicar en voz alta sin problema.`;
+  } else { banner.classList.remove('show') }
+}
+
+function escQ(s){ return (s||'').replace(/'/g,"\\'") }
+
+/* ---------- ACTIONS ---------- */
+function playPhrase(text, rate, btn){
+  if(btn) btn.classList.add('speaking');
+  speak(text, rate);
+}
+
+function startMic(expected, pattern){
+  const diag = diagnoseMic();
+  if(!diag.ok){
+    showMicError(diag, expected);
+    return;
+  }
+  if(listening){ try{recognition.stop()}catch(e){} return; }
+  recognition = initRecog();
+  if(!recognition) return;
+
+  const btn = document.getElementById('micBtn');
+  const status = document.getElementById('micStatus');
+  const heard = document.getElementById('micHeard');
+
+  recognition.onresult = (e)=>{
+    const text = e.results[0][0].transcript;
+    heard.innerHTML = `<b>Escuché:</b> "${text}"`;
+    heard.classList.add('show');
+    const expWords = expected.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(w=>w.length>2);
+    const heardWords = text.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/);
+    const hits = expWords.filter(w=>heardWords.includes(w)).length;
+    const pct = expWords.length ? hits/expWords.length : 0;
+    const fb = document.getElementById('feedback');
+    if(pct >= 0.6){
+      fb.className='feedback good show';
+      fb.innerHTML = `<div class="fb-title">¡Muy bien! 🌱</div><div class="fb-text">Tu pronunciación se entendió. Cada vez que repites, se vuelve más automática.</div>`;
+      state.sessionStats.correct++;
+      state.sessionStats.xp += 10;
+    } else if(pct >= 0.3){
+      fb.className='feedback partial show';
+      fb.innerHTML = `<div class="fb-title">Casi, sigue 🌿</div><div class="fb-text">Se entendieron algunas palabras. Toca 🐢 para escuchar lento y vuelve a intentar — sin presión.</div>`;
+      state.sessionStats.xp += 5;
+    } else {
+      fb.className='feedback bad show';
+      fb.innerHTML = `<div class="fb-title">Vamos otra vez 💛</div><div class="fb-text">Equivocarse es parte del proceso. Escucha la frase de nuevo y repite con calma. Nadie te está mirando.</div>`;
+    }
+    state.sessionStats.total++;
+    document.getElementById('continueBtn').classList.add('show');
+  };
+  recognition.onerror = (e)=>{
+    handleMicError(e.error, expected);
+    listening=false;
+    btn.classList.remove('recording');
+  };
+  recognition.onend = ()=>{
+    listening=false;
+    btn.classList.remove('recording');
+    if(!document.getElementById('micHeard').classList.contains('show')){
+      status.textContent = 'Toca el micrófono';
+    }
+  };
+
+  try{
+    recognition.start();
+    listening = true;
+    btn.classList.add('recording');
+    status.textContent = '🔴 Te escucho… habla ahora';
+  }catch(e){
+    handleMicError('start-failed', expected);
+  }
+}
+
+function handleMicError(code, expected){
+  const fb = document.getElementById('feedback');
+  let title='', msg='';
+  if(code==='not-allowed' || code==='permission-denied'){
+    title = 'Permiso de micrófono denegado';
+    msg = 'Toca el candado/ⓘ junto a la URL → Permisos → Micrófono → Permitir. Luego recarga.';
+  } else if(code==='no-speech'){
+    title = 'No se escuchó nada';
+    msg = 'Acércate al micrófono y vuelve a intentar. O usa el modo sin micrófono abajo.';
+  } else if(code==='audio-capture'){
+    title = 'No se encontró el micrófono';
+    msg = 'Otra app puede estar usándolo (WhatsApp, Zoom). Ciérralas y reintenta.';
+  } else if(code==='network'){
+    title = 'Sin conexión para reconocimiento de voz';
+    msg = 'El reconocimiento de voz necesita internet. Conéctate a wifi o datos.';
+  } else {
+    title = 'Micrófono no disponible';
+    msg = 'Puedes seguir aprendiendo en modo sin micrófono.';
+  }
+  fb.className='feedback partial show';
+  fb.innerHTML = `<div class="fb-title">${title}</div><div class="fb-text">${msg}</div>
+    <button class="audio-btn" style="margin-top:10px;width:100%;justify-content:center;background:var(--ink);color:#fff" onclick="manualMode('${escQ(expected)}')">Practicar sin micrófono →</button>`;
+}
+
+function showMicError(diag, expected){
+  const fb = document.getElementById('feedback');
+  fb.className='feedback partial show';
+  fb.innerHTML = `<div class="fb-title">${diag.title}</div>
+    <div class="fb-text">${diag.msg}</div>
+    <button class="audio-btn" style="margin-top:10px;width:100%;justify-content:center;background:var(--ink);color:#fff" onclick="manualMode('${escQ(expected)}')">Practicar sin micrófono →</button>`;
+}
+
+function manualMode(expected){
+  const fb = document.getElementById('feedback');
+  fb.className='feedback good show';
+  fb.innerHTML = `<div class="fb-title">Modo sin micrófono 🌿</div>
+    <div class="fb-text">Di esta frase en voz alta tres veces, sin que nadie te juzgue:</div>
+    <div style="background:#fff;border:1px dashed var(--moss);border-radius:10px;padding:12px;margin-top:10px;font-family:'Instrument Serif',serif;font-size:20px;line-height:1.3;text-align:center;color:#1f4533">"${expected}"</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="audio-btn" style="flex:1;justify-content:center" onclick="speak('${escQ(expected)}', 0.95)">🔊 Escuchar</button>
+      <button class="audio-btn slow" style="flex:1;justify-content:center" onclick="speak('${escQ(expected)}', 0.6)">🐢 Lento</button>
+    </div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;text-align:center;font-style:italic">Cuando la hayas dicho 3 veces, toca "Siguiente"</div>`;
+  state.sessionStats.total++;
+  state.sessionStats.xp += 5;
+  document.getElementById('continueBtn').classList.add('show');
+}
+
+function startMicFree(patternSrc, expected){
+  const diag = diagnoseMic();
+  if(!diag.ok){
+    showMicError(diag, expected || 'Practice the phrase shown above');
+    return;
+  }
+  if(listening){ try{recognition.stop()}catch(e){} return; }
+  recognition = initRecog();
+  const btn = document.getElementById('micBtn');
+  const status = document.getElementById('micStatus');
+  const heard = document.getElementById('micHeard');
+  const pattern = new RegExp(patternSrc, 'i');
+
+  recognition.onresult = (e)=>{
+    const text = e.results[0][0].transcript;
+    heard.innerHTML = `<b>Escuché:</b> "${text}"`;
+    heard.classList.add('show');
+    const fb = document.getElementById('feedback');
+    if(pattern.test(text)){
+      fb.className='feedback good show';
+      fb.innerHTML = `<div class="fb-title">¡Excelente! 🎯</div><div class="fb-text">Estructura correcta. Esto es exactamente lo que dirías en una situación real.</div>`;
+      state.sessionStats.correct++;
+      state.sessionStats.xp += 15;
+    } else if(text.split(' ').length >= 3){
+      fb.className='feedback partial show';
+      fb.innerHTML = `<div class="fb-title">Buen intento 🌿</div><div class="fb-text">Hablaste, que es lo más importante. La estructura se afina con repetición — vuelve a intentarlo o sigue.</div>`;
+      state.sessionStats.xp += 8;
+    } else {
+      fb.className='feedback bad show';
+      fb.innerHTML = `<div class="fb-title">Vamos otra vez 💛</div><div class="fb-text">Intenta una oración completa, sin miedo. Lee el ejemplo en la tarjeta y dilo en voz alta.</div>`;
+    }
+    state.sessionStats.total++;
+    document.getElementById('continueBtn').classList.add('show');
+  };
+  recognition.onerror = (e)=>{
+    handleMicError(e.error, expected || 'the phrase above');
+    listening=false;
+    btn.classList.remove('recording');
+  };
+  recognition.onend = ()=>{
+    listening=false;
+    btn.classList.remove('recording');
+    if(!document.getElementById('micHeard').classList.contains('show')){
+      status.textContent = 'Toca el micrófono';
+    }
+  };
+
+  try{
+    recognition.start();
+    listening = true;
+    btn.classList.add('recording');
+    status.textContent = '🔴 Te escucho… habla ahora';
+  }catch(e){
+    handleMicError('start-failed', expected || 'the phrase above');
+  }
+}
+
+function pickChoice(idx, correct, hint){
+  const buttons = document.querySelectorAll('.choice');
+  buttons.forEach(b=>b.disabled=true);
+  const fb = document.getElementById('feedback');
+  state.sessionStats.total++;
+  if(idx===correct){
+    buttons[idx].classList.add('correct');
+    fb.className='feedback good show';
+    fb.innerHTML = `<div class="fb-title">¡Correcto! 🎯</div><div class="fb-text">${hint||'Bien hecho.'}</div>`;
+    state.sessionStats.correct++;
+    state.sessionStats.xp += 10;
+  } else {
+    buttons[idx].classList.add('wrong');
+    buttons[correct].classList.add('correct');
+    fb.className='feedback partial show';
+    fb.innerHTML = `<div class="fb-title">No exactamente — y está bien.</div><div class="fb-text">La respuesta correcta es <b>${buttons[correct].querySelector('span:last-child').textContent}</b>. ${hint||''}</div>`;
+    state.sessionStats.xp += 3; // partial credit for trying
+  }
+  document.getElementById('continueBtn').classList.add('show');
+}
+
+/* ---------- NAVIGATION ---------- */
+function nextCard(){
+  const u = state.currentUnit;
+  state.currentCardIdx++;
+  if(state.currentCardIdx >= u.cards.length){
+    finishUnit();
+  } else {
+    renderCard();
+  }
+}
+
+function finishUnit(){
+  const u = state.currentUnit;
+  // update progress
+  state.unitProgress[u.id] = Math.min(100, (state.unitProgress[u.id]||0) + 100); // mark done in this prototype
+  state.xp += state.sessionStats.xp;
+  state.streak = Math.max(state.streak, 1) + 0; // would advance daily in real app
+
+  document.getElementById('statXP').textContent = state.sessionStats.xp;
+  document.getElementById('statStreak').textContent = state.streak;
+  const acc = state.sessionStats.total ? Math.round(100*state.sessionStats.correct/state.sessionStats.total) : 0;
+  document.getElementById('statAcc').textContent = acc + '%';
+
+  // Compassionate message based on result
+  let msg;
+  if(acc >= 80) msg = "Hoy fluiste. No te confíes — la constancia te lleva más lejos que un día perfecto.";
+  else if(acc >= 50) msg = "No hiciste todo perfecto, y eso está bien. Hiciste hoy. Mañana es la única regla.";
+  else msg = "Equivocarte hoy es invertir. Tu próximo intento sale mejor — siempre. Vuelve mañana, sin culpa.";
+  document.getElementById('completeMsg').textContent = msg;
+
+  showScreen('complete');
+}
+
+function goHome(){
+  showScreen('home');
+  renderUnits();
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
+  if(name==='home'){ showScreen('home'); renderUnits(); }
+  else if(name==='vocab'){ showVocab(); }
+}
+
+function showVocab(){
+  showScreen('vocab');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen==='vocab'));
+  const grid = document.getElementById('vocabGrid');
+  if(state.vocabSeen.length === 0){
+    grid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--ink-soft);font-size:14px">
+      Empieza una sesión y aquí guardarás las frases que vas aprendiendo, listas para repasar cuando quieras.
+    </div>`;
+    return;
+  }
+  grid.innerHTML = state.vocabSeen.map(v=>`
+    <div class="vocab-row">
+      <div style="flex:1;min-width:0">
+        <div class="en">${v.en}</div>
+        <div class="es">${v.es}</div>
+      </div>
+      <button onclick="speak('${escQ(v.en)}', 0.95)">🔊</button>
+    </div>
+  `).join('');
+}
+
+function showProfile(){
+  alert(`📊 Tu progreso\n\nDías de racha: ${state.streak}\nXP totales: ${state.xp}\n\nSeguir así. Sin culpa, sin prisa.`);
+}
+
+/* ---------- INIT ---------- */
+renderUnits();
+
+// Run mic diagnosis at startup and show banner if there's a problem
+(function initMicCheck(){
+  const d = diagnoseMic();
+  if(!d.ok){
+    document.getElementById('homeMicWarn').style.display = 'block';
+    document.getElementById('homeMicWarnTitle').textContent = d.title;
+    document.getElementById('homeMicWarnMsg').textContent = d.msg;
+  }
+})();
+</script>
+</body>
+</html>
