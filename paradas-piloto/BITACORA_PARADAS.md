@@ -1,7 +1,7 @@
 # BITÁCORA — Dashboard de Paradas TL1 / TL2 / TL3
 
-**Proyecto:** Dashboard de Paradas — Aceros Arequipa  
-**Estado:** piloto local validado / preparación para despliegue operativo  
+**Proyecto:** Dashboard de Paradas — Laminación  
+**Estado:** piloto local validado / preparación de publicación externa protegida  
 **Última actualización:** 2026-09-06  
 **Repositorio:** `Hidroraices/Ingles`  
 **Independencia:** este proyecto es independiente de JARVIS / DEPROETAID. No usar ni modificar su backend, Supabase ni repositorios.
@@ -10,22 +10,36 @@
 
 ## 1. Objetivo
 
-Construir un sistema local para consultar y analizar las paradas de los trenes laminadores TL1, TL2 y TL3, combinando:
+Construir un sistema para consultar y analizar las paradas de los trenes laminadores TL1, TL2 y TL3 combinando histórico consolidado y paradas del día, sin exigir trabajo adicional al operador.
 
-1. histórico consolidado;
-2. paradas del día todavía no consolidadas;
-3. agentes operativos que lean los reportes XLSM de cada tren sin modificarlos;
-4. una PC central que mantenga la base SQLite y publique el dashboard en la red local.
-
-El dashboard debe responder rápidamente: qué ocurrió, en qué tren/equipo/producto, cuánto tiempo se perdió, si hubo barras trabadas, si la parada superó 20 minutos y cuál fue la causa.
+El producto final debe permitir consulta gerencial dentro y fuera de planta, pero la publicación externa debe estar protegida y no debe convertir los archivos operativos ni la infraestructura de planta en recursos accesibles desde Internet.
 
 ---
 
-## 2. Fuente histórica consolidada
+## 2. Principio de seguridad del piloto
 
-Durante el piloto se utilizó el Excel maestro de OneDrive:
+El piloto se divide en tres capas:
 
-`D:\OneDrive - CORPORACIÓN ACEROS AREQUIPA SA\2.0 Laminación\1. Informes Laminación\1.0 BASE DE DATOS _ BO\Base de datos paradas.xlsx`
+1. **Captura:** los agentes leen los reportes operativos en solo lectura.
+2. **Consolidación:** una central combina histórico + eventos del día.
+3. **Publicación protegida:** el usuario autorizado accede desde fuera de planta mediante un canal autenticado y cifrado.
+
+Reglas obligatorias:
+
+- No publicar los Excel fuente.
+- No publicar rutas internas, credenciales, nombres de archivos operativos ni datos personales innecesarios.
+- No abrir acceso entrante directo desde Internet hacia las PCs de los trenes.
+- No almacenar datos productivos reales en GitHub.
+- La publicación externa debe requerir identidad/autorización.
+- El tráfico externo debe viajar cifrado.
+- Para el piloto, preferir acceso privado sobre una red segura antes que exponer una URL pública.
+- Registrar qué campos salen de planta y mantener una matriz de minimización de datos para elevar a TI/Seguridad de Información.
+
+---
+
+## 3. Fuente histórica consolidada
+
+Durante el piloto se utiliza un Excel maestro corporativo sincronizado localmente.
 
 Hoja fuente: `REGISTRO_BD`.
 
@@ -35,11 +49,11 @@ Solo se leen las columnas A:V. Las columnas posteriores contienen fórmulas y no
 
 ### Incidente documentado
 
-En pruebas V06/V07 el archivo maestro llegó a quedar ilegible y Excel reportó formato/extensión inválidos. Se recuperó mediante historial de versiones de OneDrive. A partir de este incidente se abandonó COM para el maestro y se implementó el esquema seguro de V08.
+En pruebas V06/V07 el archivo maestro llegó a quedar ilegible y Excel reportó formato/extensión inválidos. Se recuperó mediante historial de versiones. A partir de este incidente se abandonó COM para el maestro y se implementó el esquema seguro de V08.
 
 ---
 
-## 3. Base histórica validada en V08
+## 4. Base histórica validada en V08
 
 Carga completa validada el 06/09/2026:
 
@@ -63,27 +77,21 @@ Rangos observados:
 
 ### Regla de identificación del tren
 
-Se obtiene desde el prefijo de O/P:
+La clasificación del tren se obtiene del prefijo de la O/P conforme a las reglas validadas en el código operativo. Los prefijos concretos se mantienen fuera de esta bitácora pública.
 
-- TL1 → `32150...`
-- TL2 → `32230...`
-- TL3 → `3245...`
-- cualquier otro prefijo → `SIN CLASIFICAR`; nunca adivinar.
+Cualquier valor que no cumpla una regla conocida se marca `SIN CLASIFICAR`; nunca se adivina.
 
 En la carga completa actual: **0 sin clasificar**.
 
 ---
 
-## 4. Reglas de negocio validadas
+## 5. Reglas de negocio validadas
 
 ### Barras trabadas — BT
 
 La fuente de verdad es `CLASIFICACIÓN`.
 
-Se considera BT cuando la clasificación es:
-
-- `A: Imprevista con b/t`
-- `F: Imprevista con b/Chatarra`
+Se considera BT cuando la clasificación corresponde a las categorías operativas A o F validadas con el usuario.
 
 Por tanto: **BT = A OR F**.
 
@@ -102,7 +110,7 @@ No usar `>=20` para este radar.
 El dashboard conserva todo el universo de paradas y permite priorizar:
 
 - Todas las paradas.
-- BT · Clasificación A + F.
+- BT.
 - >20 min.
 - BT o >20 min.
 
@@ -110,9 +118,9 @@ No se ocultan las paradas no críticas.
 
 ---
 
-## 5. V08 — arquitectura vigente
+## 6. V08 — arquitectura vigente
 
-V08 reemplazó la dependencia de Supabase por arquitectura local:
+V08 es la central local validada:
 
 - FastAPI.
 - SQLite local.
@@ -121,8 +129,7 @@ V08 reemplazó la dependencia de Supabase por arquitectura local:
 - sincronización histórica prevista 08:30 y 20:30;
 - reintentos posteriores si falla una sincronización;
 - actualización manual disponible;
-- servidor preparado en `0.0.0.0:8787`;
-- acceso local actual: `http://127.0.0.1:8787/`.
+- servidor LAN preparado para recibir agentes y servir el dashboard.
 
 V08 no depende de JARVIS/DEPROETAID.
 
@@ -133,8 +140,8 @@ Incluye:
 - Fecha inicio / fecha fin.
 - Planta / Tren.
 - Producto.
-- Producto dependiente del tren seleccionado; no debe mostrar productos de otros trenes.
-- Sin botón `Aplicar`: los filtros deben reaccionar directamente.
+- Producto dependiente del tren seleccionado.
+- Filtros reactivos.
 - KPIs de eventos, horas, BT, >20 min y toneladas B/T.
 - Tabla Producto / O.P / Equipo.
 - ranking de horas por equipo.
@@ -142,7 +149,7 @@ Incluye:
 
 ---
 
-## 6. Integración de “paradas de hoy”
+## 7. Integración de “paradas de hoy”
 
 Se añadió una tabla separada `paradas_hoy` para que los reportes operativos puedan aparecer antes de la consolidación del Excel maestro.
 
@@ -153,21 +160,13 @@ Principio:
 - el dashboard consulta ambos universos.
 - cuando el mismo evento llega posteriormente al histórico, debe evitarse mostrarlo duplicado.
 
-La integración añadió un endpoint de ingestión local para agentes y mantiene separado el histórico.
-
 ---
 
-## 7. Agente TL1 — prueba real validada
+## 8. Agente TL1 — prueba real validada
 
-Ruta operacional TL1:
+El 06/09/2026 se probó el agente TL1 contra un reporte operacional real.
 
-`T:\2026`
-
-El 06/09/2026 se probó el agente contra:
-
-`T:\2026\Setiembre\06092026-domingo.xlsm`
-
-Resultado real inicial:
+Resultado:
 
 - eventos detectados: **4**;
 - listos: **4**;
@@ -175,8 +174,7 @@ Resultado real inicial:
 - central recibió: **4**;
 - insertó: **4**;
 - rechazó: **0**;
-- errores: **0**;
-- `total_paradas_hoy = 4`.
+- errores: **0**.
 
 El agente no modifica el XLSM y no escribe directamente SQLite; envía los eventos a la central.
 
@@ -184,11 +182,11 @@ Después de la integración, TL1 pasó visualmente de 9,760 históricos a **9,76
 
 ---
 
-## 8. Fecha operativa y turno nocturno — hotfix validado
+## 9. Fecha operativa y turno nocturno — hotfix validado
 
-Las pruebas con archivos reales de setiembre demostraron que el nombre del archivo no puede tomarse como fecha de verdad y que algunos F7 pueden estar vacíos.
+Las pruebas con archivos reales demostraron que el nombre del archivo no puede tomarse como fecha de verdad y que algunos campos de fecha pueden estar vacíos.
 
-Se implementó la siguiente regla:
+Regla validada:
 
 ### TURNO 1 — nocturno 20:00–08:00
 
@@ -201,9 +199,9 @@ Si la fecha operativa base es D:
 
 Conserva la fecha operativa base D.
 
-### F7 vacío
+### Fecha vacía
 
-Si F7 de un turno está vacío, el agente intenta heredar la fecha válida del otro turno del mismo XLSM.
+Si la fecha de un turno está vacía, el agente intenta heredar la fecha válida del otro turno del mismo XLSM.
 
 **Nunca usar el nombre del archivo como fecha de verdad.**
 
@@ -217,56 +215,34 @@ Prueba posterior al hotfix:
 - insertados: **2**;
 - actualizados: **2**;
 - rechazados: **0**;
-- `total_paradas_hoy`: **4**;
+- total operacional: **4**;
 - errores: **0**.
 
-Por tanto, la corrección temporal no produjo ocho eventos.
-
-### Validación visual definitiva
-
-Para O/P `321500014413`, producto `REDONDO LISO MOLI 1105 65 MM X 7.00M`:
-
-**05/09/2026 — TL1**
-- 2 eventos.
-- Equipo: Todo el tren.
-- 2.92 h.
-
-**06/09/2026 — TL1**
-- 2 eventos.
-- Equipo: Cizalla volante N.º 4.
-- ~0.97 h.
-
-Total operacional: **4 eventos / ~3.9 h**.
-
-Esto valida el cruce de medianoche del turno nocturno.
+Validación visual: los cuatro eventos quedaron distribuidos correctamente entre dos fechas calendario por el cruce de medianoche del turno nocturno.
 
 ---
 
-## 9. Reportes operativos y macro existente
+## 10. Reportes operativos y macro existente
 
-Se revisó la macro `ConsolidarParadasYGenerarYEnviarReportePDFinal2` utilizada en los reportes operativos.
+Se revisó la macro de consolidación utilizada en los reportes operativos.
 
 La macro actualmente:
 
-- valida hoja TURNO 1 / TURNO 2;
+- valida hojas de turno;
 - revisa barras trabadas;
 - valida análisis/corrección;
-- puede completar cantidad B/T faltante con 1;
-- copia registros a `Registro_Histórico.xlsx` / `REGISTRO_BD`;
+- consolida registros;
 - genera PDF;
 - envía correo mediante Outlook;
-- al cerrar TURNO 2 puede generar el archivo del día siguiente;
-- limpia rangos del nuevo reporte.
+- puede generar el archivo operativo del día siguiente.
 
-La nueva arquitectura NO debe depender de modificar esta macro para leer paradas. El agente debe ser observador de solo lectura.
+La nueva arquitectura NO depende de modificar esta macro para leer paradas. El agente debe ser observador de solo lectura.
 
 ---
 
-## 10. Rutas operativas previstas
+## 11. Rutas operativas
 
-- TL1 → `T:\2026`
-- TL2 → `S:\2026`
-- TL3 → `L:\2026`
+Cada tren utiliza una ruta corporativa propia. Las letras y rutas concretas se mantienen fuera de esta bitácora pública.
 
 Los agentes de cada tren deben leer únicamente su fuente operacional y enviar eventos a la central.
 
@@ -274,65 +250,86 @@ No deben construir el histórico ni modificar los XLSM.
 
 ---
 
-## 11. Arquitectura objetivo para despliegue
+## 12. Arquitectura objetivo
 
-### PC central — siempre encendida
+### Capa de captura
 
-Responsabilidades:
-
-- FastAPI.
-- SQLite.
-- Dashboard.
-- recibir eventos TL1/TL2/TL3.
-- consolidar histórico desde una fuente estable.
-- publicar `:8787` en la LAN.
-
-La central no debe depender de una ruta personal como:
-
-`D:\OneDrive - ...`
-
-que solo existe en la PC del desarrollador/usuario.
-
-Antes del despliegue definitivo se debe definir una fuente histórica accesible desde la PC central, preferentemente:
-
-- sincronización corporativa de OneDrive/SharePoint bajo la cuenta de la PC central, o
-- una ruta de red corporativa estable autorizada.
-
-No es necesario compartir el OneDrive personal con las PCs TL1/TL2/TL3: esos equipos solo necesitan leer sus rutas T:/S:/L: y alcanzar la IP/puerto de la central.
-
-### PCs TL1 / TL2 / TL3
-
-Cada una tendrá un agente local que:
+Cada tren tendrá un agente local que:
 
 - identifica el reporte activo;
-- lee TURNO 1/TURNO 2;
+- lee los turnos;
 - calcula fecha calendario correctamente;
 - detecta eventos completos/incompletos;
 - no modifica Excel;
-- envía los eventos a la central;
-- posteriormente deberá alertar localmente al operador sobre información crítica/incompleta.
+- envía los eventos a la central.
+
+### Capa central
+
+Una PC central siempre encendida:
+
+- recibe TL1/TL2/TL3;
+- mantiene SQLite;
+- consolida histórico + día;
+- sirve el dashboard dentro de planta.
+
+La central debe usar una fuente histórica corporativa estable y no depender de una ruta personal.
+
+### Capa de publicación externa protegida
+
+Para el piloto, la publicación externa debe realizarse mediante un canal privado autenticado y cifrado que no abra directamente la red de planta a Internet.
+
+Objetivo de experiencia:
+
+- usuario autorizado → accede desde celular/laptop fuera de planta;
+- usuario no autorizado → no puede descubrir ni consultar los datos;
+- archivos Excel y rutas internas → permanecen en planta;
+- PCs TL1/TL2/TL3 → no reciben conexiones directas desde Internet.
+
+Antes de una publicación corporativa definitiva, elevar el piloto a TI/Seguridad de Información con la matriz de campos y controles implementados.
 
 ---
 
-## 12. Pendientes inmediatos
+## 13. Datos permitidos para publicación piloto
 
-1. Construir paquete definitivo de PC central.
-2. Definir la ubicación definitiva del Excel maestro para que la central pueda sincronizarlo sin depender de la PC personal.
-3. Construir agentes definitivos TL1, TL2 y TL3 usando T:/S:/L:.
-4. Configurar dirección/IP de la central en los agentes.
-5. Configurar Windows Firewall para acceso LAN a TCP 8787.
-6. Configurar inicio automático del servicio central y agentes.
-7. Definir frecuencia de lectura/envío operacional.
-8. Incorporar alerta local de reporte/parada incompleta.
-9. Probar conectividad desde cada PC de tren hacia la central.
-10. Probar dashboard desde una PC distinta a la central.
-11. Validar TL2 y TL3 con archivos reales antes de declararlos productivos.
-12. Endurecer identidad de eventos para escenarios de inserción/reordenamiento de filas del Excel.
-13. Reimplementar, después de estabilizar lo anterior, el radar de eventos repetitivos/acumulados del diseño anterior.
+Por defecto, la capa externa debe limitarse a datos necesarios para análisis gerencial:
+
+- fecha;
+- tren;
+- producto o categoría autorizada;
+- O/P solo si TI/negocio la considera necesaria;
+- equipo;
+- duración;
+- clasificación BT/no BT;
+- indicador >20 min;
+- causa/categoría de causa si está autorizada;
+- toneladas B/T si se requieren en los KPIs.
+
+Excluir por defecto de la publicación externa:
+
+- nombres de trabajadores;
+- rutas internas;
+- nombres físicos de archivos;
+- credenciales;
+- información de configuración de red;
+- campos del Excel que no aporten al análisis gerencial.
 
 ---
 
-## 13. Criterio de continuidad
+## 14. Pendientes inmediatos
+
+1. Validar agentes TL2 y TL3 con archivos reales.
+2. Dejar la central en una PC siempre encendida.
+3. Implementar acceso externo privado, autenticado y cifrado para el piloto.
+4. Validar acceso desde un equipo externo sin abrir acceso directo a las PCs de los trenes.
+5. Activar registro de accesos y usuarios autorizados.
+6. Validar la matriz de datos publicados y excluir datos personales/no necesarios.
+7. Preparar resumen de arquitectura y controles para elevar a TI/Seguridad de Información.
+8. Configurar inicio automático de central y agentes.
+9. Reimplementar, después de estabilizar lo anterior, el radar de eventos repetitivos/acumulados.
+
+---
+
+## 15. Criterio de continuidad
 
 No crear nuevas versiones por cada ajuste menor. Trabajar sobre el estado validado y generar backup antes de cambios de código.
 
@@ -342,4 +339,5 @@ Antes de cualquier modificación futura:
 2. verificar el código realmente desplegado;
 3. verificar conteos de SQLite/dashboard;
 4. preservar el Excel maestro en solo lectura;
-5. no mezclar este proyecto con JARVIS/DEPROETAID.
+5. no mezclar este proyecto con JARVIS/DEPROETAID;
+6. no publicar información real fuera de planta sin los controles de acceso definidos.
